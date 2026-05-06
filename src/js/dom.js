@@ -1,11 +1,11 @@
-// src/js/dom.js
 
-// ===== SELECTORS =====
+
+// SELECTORS 
 const projectListEl = document.getElementById("project-list");
 const todoListEl = document.getElementById("todo-list");
 const currentProjectTitle = document.getElementById("current-project-title");
 
-// ===== RENDER PROJECTS =====
+// RENDER PROJECTS
 export function renderProjects(projects, currentProjectIndex) {
   projectListEl.innerHTML = "";
 
@@ -22,7 +22,7 @@ export function renderProjects(projects, currentProjectIndex) {
   });
 }
 
-// ===== RENDER TODOS =====
+// RENDER TODOS 
 export function renderTodos(project) {
   todoListEl.innerHTML = "";
 
