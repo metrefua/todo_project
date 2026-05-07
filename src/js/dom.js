@@ -17,6 +17,13 @@ export function renderProjects(projects, currentProjectIndex) {
       li.style.background = "#334155";
     }
 
+    li.innerHTML = `
+      <div class="project-item">
+        <span class="project-name">${project.name}</span>
+        <button class="delete-project-btn" data-index="${index}"> ✕ </button>
+      </div>
+    `;
+
     projectListEl.appendChild(li);
   });
 }

@@ -345,6 +345,38 @@ body {
   flex-wrap: wrap;
 }
 
+/* Project Item */
+
+.project-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.project-name {
+  flex: 1;
+  word-break: break-word;
+}
+
+/* Delete Project Button */
+
+.delete-project-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.delete-project-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #ef4444;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   #app {

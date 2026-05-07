@@ -97,6 +97,30 @@ cancelProjectBtn.addEventListener("click", () => {
 
 // Switch Project
 projectListEl.addEventListener("click", (e) => {
+   // Delete project
+  if (e.target.classList.contains("delete-project-btn")) {
+
+    e.stopPropagation();
+
+    const index = Number(e.target.dataset.index);
+
+    // Prevent deleting last project
+    if (projects.length === 1) {
+      alert("You must have at least one project.");
+      return;
+    }
+
+    projects.splice(index, 1);
+
+    // Adjust current project index
+    if (currentProjectIndex >= projects.length) {
+      currentProjectIndex = projects.length - 1;
+    }
+
+    render();
+
+    return;
+  }
   const li = e.target.closest("li");
 
   if (!li) return;
