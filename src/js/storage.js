@@ -1,5 +1,4 @@
 import createProject from "./project";
-import createTodo from "./todo";
 
 const STORAGE_KEY = "todoAppData";
 
@@ -12,29 +11,17 @@ export function saveProjects(projects) {
 export function loadProjects() {
   const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-  if (!data) {
-    // First time → create default project
-    const defaultProject = createProject("Default");
-    return [defaultProject];
+  if (!data || data.length === 0) {
+    return [createProject("Default")];
   }
 
   // Rebuild projects and todos 
   return data.map(projectData => {
     const project = createProject(projectData.name);
-    project.id = projectData.id;
 
-    project.todos = projectData.todos.map(todoData => {
-      const todo = createTodo(
-        todoData.title,
-        todoData.description,
-        todoData.dueDate,
-        todoData.priority
-      );
-
-      todo.id = todoData.id;
-      todo.completed = todoData.completed;
-
-      return todo;
+    // Properly restore todos into closure
+    projectData.todos?.forEach((todoData) => {
+      project.addTodo(todoData);
     });
 
     return project;
