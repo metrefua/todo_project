@@ -40,14 +40,10 @@ This project follows **clean architecture principles**:
 
 ## Installation
 
-Clone the repository
+Clone the repository and Install dependencies
 
 ```bash
 git clone https://github.com/your-username/todo-list.git
 cd todo-list
-
-Install dependencies
-
-```bash
 npm install
 npm run dev
