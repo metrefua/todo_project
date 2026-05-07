@@ -38,6 +38,12 @@ This project follows **clean architecture principles**:
 
 1. Clone the repository:
 
+## Installation
+
+Clone the repository and Install dependencies
+
 ```bash
-git clone <https://github.com/metrefua/todo_project.git>
-cd todo_project
+git clone https://github.com/your-username/todo-list.git
+cd todo-list
+npm install
+npm run dev
