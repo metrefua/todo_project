@@ -35,6 +35,13 @@ export default function createProject(name = "Default") {
     }
   };
 
+  const toJSON = () => {
+    return {
+      name,
+      todos,
+    };
+  };
+
   return {
     name,
     getTodos,
@@ -42,5 +49,6 @@ export default function createProject(name = "Default") {
     removeTodo,
     getTodoById,
     updateTodo,
+    toJSON,
   };
 }

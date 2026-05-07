@@ -25,21 +25,11 @@ const cancelProjectBtn = document.getElementById("cancel-project");
 
 // INIT
 function init() {
-  const storedProjects = loadProjects();
 
-  if (storedProjects && storedProjects.length > 0) {
-    projects = storedProjects.map((p) => {
-      const project = createProject(p.name);
+  projects = loadProjects();
 
-      p.todos?.forEach((todo) => {
-        project.addTodo(todo);
-      });
-
-      return project;
-    });
-  }
-
-  if (projects.length === 0) {
+  // Safety fallback
+  if (!projects || projects.length === 0) {
     projects = [createProject("Default")];
   }
 

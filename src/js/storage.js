@@ -4,7 +4,16 @@ const STORAGE_KEY = "todoAppData";
 
 // Save projects to localStorage
 export function saveProjects(projects) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  // Convert factory objects into plain objects
+  const plainProjects = projects.map((project) => ({
+    name: project.name,
+    todos: project.getTodos(),
+  }));
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(plainProjects)
+  );
 }
 
 // Load projects from localStorage
