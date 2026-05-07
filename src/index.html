@@ -18,13 +18,52 @@
     <!-- Main Content (Todos) -->
     <main class="main">
       <header class="main-header">
-        <h1 id="current-project-title">Default</h1>
+        <h1 id="current-project-title">Add projects and Tasks</h1>
+        <div class="filters">
+          <button data-filter="all">All</button>
+          <button data-filter="active">Active</button>
+          <button data-filter="completed">Completed</button>
+        </div>
         <button id="add-todo-btn">+ Add Todo</button>
       </header>
 
       <section id="todo-list" class="todo-list"></section>
     </main>
-
+    <!-- Todo modal -->
+    <div id="todo-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Add Todo</h2>
+        
+        <form id="todo-form">
+          <input type="text" id="todo-title" placeholder="Title" required />
+          <textarea id="todo-description" placeholder="Description"></textarea>
+          <input type="date" id="todo-date"/>
+          <select id="todo-priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          
+          <div class="form-actions">
+            <button type="submit" id="save-todo-btn">Save</button>
+            <button type="button" id="cancel-todo"> Cancel</button>
+          </div>
+        </form>
+     </div>
+    </div>
+    <!-- Todo modal -->
+      <div id="project-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Add Project</h2>
+          <form id="project-form">
+            <input type="text" id="project-name" placeholder="Project name" required />
+            <div class="form-actions">
+              <button type="submit" id="save-project-btn">Add</button>
+              <button type="button" id="cancel-project">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
   </div>
 </body>
 </html>
