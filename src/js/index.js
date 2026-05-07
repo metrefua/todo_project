@@ -4,24 +4,34 @@ import createProject from "./project";
 import { saveProjects, loadProjects } from "./storage";
 import { renderProjects, renderTodos } from "./dom";
 
-// STATE 
+// STATE
 let projects = [];
 let currentProjectIndex = 0;
+let currentFilter = "all";
+let editingTodoId = null;
 
-// DOM ELEMENTS 
+// DOM ELEMENTS
 const addProjectBtn = document.getElementById("add-project-btn");
 const addTodoBtn = document.getElementById("add-todo-btn");
 const projectListEl = document.getElementById("project-list");
 
-// INIT 
+const todoModal = document.getElementById("todo-modal");
+const todoForm = document.getElementById("todo-form");
+const cancelTodoBtn = document.getElementById("cancel-todo");
+
+const projectModal = document.getElementById("project-modal");
+const projectForm = document.getElementById("project-form");
+const cancelProjectBtn = document.getElementById("cancel-project");
+
+// INIT
 function init() {
   const storedProjects = loadProjects();
 
-  if (storedProjects.length > 0) {
-    projects = storedProjects.map(p => {
+  if (storedProjects && storedProjects.length > 0) {
+    projects = storedProjects.map((p) => {
       const project = createProject(p.name);
 
-      p.todos?.forEach(todo => {
+      p.todos?.forEach((todo) => {
         project.addTodo(todo);
       });
 
@@ -29,9 +39,8 @@ function init() {
     });
   }
 
-
   if (projects.length === 0) {
-    projects.push(createProject("Default"));
+    projects = [createProject("Default")];
   }
 
   currentProjectIndex = 0;
@@ -39,39 +48,57 @@ function init() {
   render();
 }
 
+// SAVE 
+function save() {
+  saveProjects(projects);
+}
+
 // RENDER
 function render() {
+  if (projects.length === 0) {
+    projects.push(createProject("Default"));
+    currentProjectIndex = 0;
+  }
+
+  if (!projects[currentProjectIndex]) {
+    currentProjectIndex = 0;
+  }
+
   renderProjects(projects, currentProjectIndex);
-  renderTodos(projects[currentProjectIndex]);
+  renderTodos(projects[currentProjectIndex], currentFilter);
+
   save();
 }
 
-// SAVE 
-function save() {
-  const plainProjects = projects.map(project => ({
-    name: project.name,
-    todos: project.getTodos()
-  }));
-
-  saveProjects(plainProjects);
-}
-
-// EVENTS 
-
-// Add Project
+// ADD PROJECT 
 addProjectBtn.addEventListener("click", () => {
-  const name = prompt("Enter project name:");
+  projectModal.classList.remove("hidden");
+});
+
+projectForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("project-name").value.trim();
+
   if (!name) return;
 
   projects.push(createProject(name));
   currentProjectIndex = projects.length - 1;
 
+  projectForm.reset();
+  projectModal.classList.add("hidden");
+
   render();
+});
+
+cancelProjectBtn.addEventListener("click", () => {
+  projectModal.classList.add("hidden");
 });
 
 // Switch Project
 projectListEl.addEventListener("click", (e) => {
   const li = e.target.closest("li");
+
   if (!li) return;
 
   const index = Number(li.dataset.index);
@@ -85,70 +112,129 @@ projectListEl.addEventListener("click", (e) => {
   render();
 });
 
-// Add Todo
+// Open Todo Modal
 addTodoBtn.addEventListener("click", () => {
+  editingTodoId = null;
+
+  todoForm.reset();
+
+  todoModal.classList.remove("hidden");
+});
+
+// SAVE TODO 
+todoForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
   const project = projects[currentProjectIndex];
 
-  if (!project) {
-    alert("No project selected.");
-    return;
-  }
+  if (!project) return;
 
-  const title = prompt("Todo title:");
+  const title = document.getElementById("todo-title").value.trim();
+  const description = document.getElementById("todo-description").value.trim();
+  const dueDate = document.getElementById("todo-date").value;
+  const priority = document.getElementById("todo-priority").value;
+
   if (!title) return;
 
-  const description = prompt("Description:");
-  const dueDate = prompt("Due date (YYYY-MM-DD):");
-  const priority = prompt("Priority (low, medium, high):") || "low";
+  // Edit existing todo
+  if (editingTodoId !== null) {
+    project.updateTodo(editingTodoId, {
+      title,
+      description,
+      dueDate,
+      priority,
+    });
 
-  project.addTodo({
-    title,
-    description,
-    dueDate,
-    priority
-  });
+    editingTodoId = null;
+  }
+
+  // Create new todo 
+  else {
+    project.addTodo({
+      title,
+      description,
+      dueDate,
+      priority,
+      completed: false,
+    });
+  }
+
+  todoForm.reset();
+  todoModal.classList.add("hidden");
 
   render();
 });
 
-// TODO ACTIONS (EDIT + DELETE)
-const todoListEl = document.getElementById("todo-list");
+// Cancel todo
+cancelTodoBtn.addEventListener("click", () => {
+  editingTodoId = null;
 
-todoListEl.addEventListener("click", (e) => {
-  const todoDiv = e.target.closest(".todo-item");
-  if (!todoDiv) return;
+  todoForm.reset();
 
-  const id = Number(todoDiv.dataset.id);
+  todoModal.classList.add("hidden");
+});
+
+// Todo actions
+document.addEventListener("click", (e) => {
+  const todoItem = e.target.closest(".todo-item");
+
+  if (!todoItem) return;
+
+  const id = todoItem.dataset.id;
   const project = projects[currentProjectIndex];
 
-  // DELETE
+  if (!project) return;
+
+  // Edit todo
+  if (e.target.classList.contains("edit-btn")) {
+    const todo = project.getTodoById(id);
+
+    if (!todo) return;
+
+    editingTodoId = id;
+
+    document.getElementById("todo-title").value = todo.title;
+    document.getElementById("todo-description").value =
+      todo.description || "";
+    document.getElementById("todo-date").value = todo.dueDate || "";
+    document.getElementById("todo-priority").value =
+      todo.priority || "low";
+
+    todoModal.classList.remove("hidden");
+  }
+
+  // Delete todo
   if (e.target.classList.contains("delete-btn")) {
     project.removeTodo(id);
     render();
   }
 
-  // EDIT
-  if (e.target.classList.contains("edit-btn")) {
+  // Toggle complete 
+  if (e.target.classList.contains("toggle-complete")) {
     const todo = project.getTodoById(id);
 
-    const title = prompt("Edit title:", todo.title);
-    if (!title) return;
+    if (!todo) return;
 
-    const description = prompt("Edit description:", todo.description);
-    const dueDate = prompt("Edit due date:", todo.dueDate);
-    const priority = prompt("Edit priority:", todo.priority);
-
-    project.updateTodo(id, {
-      title,
-      description,
-      dueDate,
-      priority
-    });
+    todo.completed = e.target.checked;
 
     render();
   }
 });
 
+// Filters
+const filterButtons = document.querySelectorAll(".filters button");
 
-// START APP 
+filterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.filter;
+
+    filterButtons.forEach((b) => b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    render();
+  });
+});
+
+// START APP
 init();
